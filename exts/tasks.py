@@ -1,6 +1,5 @@
-import random
+from datetime import datetime
 
-from gspread.worksheet import Worksheet
 from mipa.ext import commands, tasks
 from mipa.ext.commands.bot import Bot
 # from mipa.ext.commands.context import Context
@@ -11,8 +10,12 @@ class Autopost(commands.Cog):
         self.bot = bot
         self.posted = []
 
-    @tasks.loop(seconds=1800)
+    @tasks.loop(seconds=60)
     async def _postLine(self) -> None:
+        now = datetime.now()
+        if now.minute not in [30, 00]:
+            return
+        
         line = self.bot.get_line()
         while line in self.posted:
             line = self.bot.get_line()

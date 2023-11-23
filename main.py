@@ -1,12 +1,13 @@
 import asyncio
 import os
+import random
 #from typing import Optional
 
 #import aiomysql
 import gspread
 from aiohttp import ClientWebSocketResponse
 from gspread.worksheet import Worksheet
-#from mipac.models.notification import NotificationNote
+from mipac.models.notification import NotificationNote
 from mipa.ext import commands
 # from mipac.models.note import Note
 from dotenv import load_dotenv
@@ -51,8 +52,7 @@ class MyBot(commands.Bot):
         return worksheet
 
     def get_line(self) -> str:
-        def get_line(self) -> str:
-        sheet: Worksheet = self.bot.get_worksheet()
+        sheet: Worksheet = self.get_worksheet()
         response = sheet.get("F4")
         if response is None or response == "":
             return
@@ -80,8 +80,13 @@ class MyBot(commands.Bot):
 #        print(f'{note.author.username}: {note.content}')
     
     async def on_mention(self, notice: NotificationNote):
-        print(f"{notice.note.author.username} requested {notice.note.content}")
-        await note.action.reply()
+        sheet = self.get_worksheet()
+        line = self.get_line()
+        result = sheet.find(line, in_column=4)
+        number = result.row - 2
+        where = sheet.get(f"C{result.row}")
+        where = where[0][0]
+        await notice.note.api.action.reply(content=f"{line}\n \n<small>- {where}에서 발췌됨. ({number}번 대사)</small>", visibility="home", reply_id=notice.note.id)
 
 
 if __name__ == '__main__':
