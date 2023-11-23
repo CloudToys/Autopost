@@ -5,6 +5,7 @@ import os
 #import aiomysql
 import gspread
 from aiohttp import ClientWebSocketResponse
+from gspread.worksheet import Worksheet
 #from mipac.models.notification import NotificationNote
 from mipa.ext import commands
 # from mipac.models.note import Note
@@ -43,11 +44,24 @@ class MyBot(commands.Bot):
 #                else:
 #                    return "Query Successful"
 
-    def get_worksheet(self):
+    def get_worksheet(self) -> Worksheet:
         gc = gspread.service_account()
         sh = gc.open_by_url(os.getenv("SPREADSHEET_URL"))
         worksheet = sh.get_worksheet(0)
         return worksheet
+
+    def get_line(self) -> str:
+        def get_line(self) -> str:
+        sheet: Worksheet = self.bot.get_worksheet()
+        response = sheet.get("F4")
+        if response is None or response == "":
+            return
+        count = int(response[0][0])
+        result = random.randint(1, count)
+        number = result + 2
+        res = sheet.get(f"D{number}")
+        text = res[0][0].strip()
+        return text
 
     async def _connect_channel(self):
         await self.router.connect_channel(['main', 'global'])
@@ -65,9 +79,9 @@ class MyBot(commands.Bot):
 #    async def on_note(self, note: Note):
 #        print(f'{note.author.username}: {note.content}')
     
-#    async def on_mention(self, notice: NotificationNote):
-#        print(f"{notice.note.author.username} requested {notice.note.content}")
-#        await self.progress_command(notice.note)
+    async def on_mention(self, notice: NotificationNote):
+        print(f"{notice.note.author.username} requested {notice.note.content}")
+        await note.action.reply()
 
 
 if __name__ == '__main__':
