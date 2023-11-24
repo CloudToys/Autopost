@@ -1,49 +1,21 @@
 import asyncio
 import os
 import random
-#from typing import Optional
 
-#import aiomysql
 import gspread
 from aiohttp import ClientWebSocketResponse
 from gspread.worksheet import Worksheet
 from mipac.models.notification import NotificationNote
 from mipa.ext import commands
-# from mipac.models.note import Note
 from dotenv import load_dotenv
 
 load_dotenv()
 
-COGS = [
-    "exts.tasks"
-]
 
-class MyBot(commands.Bot):
+class Autoposter(commands.Bot):
     def __init__(self):
         super().__init__()
-        self.max_count = int(os.getenv("MAX_COUNT"))
-
-#    async def create_pool(self) -> None:
-#        pool = await aiomysql.create_pool(
-#            minsize=5,
-#            maxsize=20,
-#            host=os.getenv("MYSQL_HOST"),
-#            port=int(os.getenv("MYSQL_PORT")),
-#            user=os.getenv("MYSQL_USER"),
-#            password=os.getenv("MYSQL_PASSWORD"),
-#            db="autopost",
-#            autocommit=True
-#        )
-#        self.pool = pool
-    
-#    async def query(self, query: str, fetch: bool = False) -> Optional[dict]:
-#        async with self.pool.acquire() as conn:
-#            async with conn.cursor(aiomysql.DictCursor) as cur:
-#                await cur.execute(query)
-#                if fetch:
-#                    return await cur.fetchall()
-#                else:
-#                    return "Query Successful"
+        self.max_count = int(os.getenv("MAX_DUPLICATE_COUNT"))
 
     def get_worksheet(self) -> Worksheet:
         gc = gspread.service_account()
@@ -51,7 +23,7 @@ class MyBot(commands.Bot):
         worksheet = sh.get_worksheet(0)
         return worksheet
 
-    def get_line(self) -> str:
+    def get_random_line(self) -> str:
         sheet: Worksheet = self.get_worksheet()
         response = sheet.get("F4")
         if response is None or response == "":
@@ -62,35 +34,39 @@ class MyBot(commands.Bot):
         res = sheet.get(f"D{number}")
         text = res[0][0].strip()
         return text
+    
+    def get_info(self, line: str) -> dict:
+        sheet = self.get_worksheet()
+        result = sheet.find(line, in_column=4)
+        number = result.row - 2
+        where = sheet.get(f"C{result.row}")
+        where = where[0][0]
+        return {"number": number, "from": where}
 
     async def _connect_channel(self):
         await self.router.connect_channel(['main', 'global'])
 
     async def on_ready(self, ws: ClientWebSocketResponse):
-        print(f'connected: {self.user.username}')
+        print(f"Connected as @{self.user.username}@{self.user.host}")
         await self._connect_channel()
-        for cog in COGS:
-            await self.load_extension(cog)
+        extensions = [
+            "exts.post"
+        ]
+        for extension in extensions:
+            await self.load_extension(extension)
 
     async def on_reconnect(self, ws: ClientWebSocketResponse):
-        print('Disconnected from server. Will try to reconnect.')
+        print("Disconnected from server.")
         await self._connect_channel()
     
-#    async def on_note(self, note: Note):
-#        print(f'{note.author.username}: {note.content}')
-    
     async def on_mention(self, notice: NotificationNote):
-        sheet = self.get_worksheet()
-        line = self.get_line()
-        result = sheet.find(line, in_column=4)
-        number = result.row - 2
-        where = sheet.get(f"C{result.row}")
-        where = where[0][0]
-        await notice.note.api.action.reply(content=f"{line}\n \n<small>- {where}에서 발췌됨. ({number}번 대사)</small>", visibility="home", reply_id=notice.note.id)
+        line = self.get_random_line()
+        info = self.get_info(line)
+        await notice.note.api.action.reply(content=f"{line}\n \n<small>- {info['where']}에서 발췌됨. ({info['number']}번 대사)</small>", reply_id=notice.note.id)
 
 
 if __name__ == '__main__':
-    bot = MyBot()
+    bot = Autoposter()
     loop = asyncio.get_event_loop()
-#    loop.run_until_complete(bot.create_pool())
-    loop.run_until_complete(bot.start(os.getenv("MISSKEY_ORIGIN"), os.getenv("MISSKEY_TOKEN")))
+    origin = os.getenv("MISSKEY_ORIGIN")
+    loop.run_until_complete(bot.start(f"wss://{origin}/streaming", os.getenv("MISSKEY_TOKEN")))
