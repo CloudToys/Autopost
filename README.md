@@ -17,13 +17,27 @@ Google 스프레드시트를 기반으로 지정된 문구들을 자동적으로
 * @멘션 시 입력된 문구 정보와 함께 즉시 문구를 출력할 수 있는 기능
 
 ## Options
-.env.example 파일을 참조하여 .env 파일을 작성해주세요.
-```
-MISSKEY_TOKEN : 계정 액세스 토큰
-MISSKEY_ORIGIN : 호스트 서버 이름 (misskey.io, phater.live...)
-MAX_DUPLICATE_COUNT : 중복 시 출력되지 않게 할 간격
-(3으로 설정 시 다음 3개의 문구가 나올 동안은 출력되지 않음)
-WORKSHEET_URL : 문구를 불러올 스프레드시트 URL
+config.example.josn 파일을 복사 후 config.json으로 이름 변경 후 작성해주세요.
+```json
+{
+    "token": "여기에는 토큰을 넣어주세요",
+    // 봇을 실행할 계정에서 "설정 -> 기타 설정의 API -> 액세스 토큰 생성 -> `노트를 작성하거나 삭제합니다` 체크 후 나온 값"
+    "origin": "여기에는 서버 주소를 넣어주세요",
+    // (k.lapy.link, phater.live... etc)
+    "max_duplicate": 3,
+    // 중복으로 처리할 대사의 최대 수
+    "rate": 60,
+    // 자동 노트 게시 간격 (분 단위)
+    "visibility": "home",
+    // 공개 범위 (public, home, followers, specified)
+    "worksheet": "여기에는 구글 스프레드시트 주소를 넣어주세요",
+    "template": {
+        "auto": "{text}",
+        // 자동으로 게시되는 노트의 템플릿 {text} = 내용 {from} = 예시 시트 기준 "대사 위치" {number} = 예시 시트 기준 "대사 번호" (꼭 숫자일 필요 없음)
+        "mention": "{text}\n \n<small>{from}에서 발췌됨. ({number}번 대사)</small>"
+        // 답장으로 게시되는 노트의 템플릿 {text} = 내용 {from} = 예시 시트 기준 "대사 위치" {number} = 예시 시트 기준 "대사 번호" (꼭 숫자일 필요 없음)
+    }
+}
 ```
 
 ## How

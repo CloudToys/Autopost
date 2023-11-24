@@ -6,7 +6,7 @@
     "visibility": "home",
     "worksheet": "YOUR_WORKSHEET_URL_HERE",
     "template": {
-        "auto": "{note}",
-        "mention": "{note}\n \nFrom {from} ({number})"
+        "auto": "{text}",
+        "mention": "{text}\n \n<small>{from}에서 발췌됨. ({number}번 대사)</small>"
     }
 }

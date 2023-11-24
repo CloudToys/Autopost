@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import random
 
 import gspread
@@ -12,7 +11,8 @@ from mipa.ext import commands
 
 class Config:
     def __init__(self, path: str) -> None:
-        raw = json.load(path)
+        file = open(path)
+        raw = json.load(file)
         self.token = raw.get("token")
         self.origin = raw.get("origin")
         self.max = raw.get("max_duplicate")
@@ -51,7 +51,7 @@ class Autoposter(commands.Bot):
 
     def get_worksheet(self) -> Worksheet:
         gc = gspread.service_account()
-        sh = gc.open_by_url(self.config["worksheet"])
+        sh = gc.open_by_url(self.config.worksheet)
         worksheet = sh.get_worksheet(0)
         return worksheet
 
@@ -72,7 +72,7 @@ class Autoposter(commands.Bot):
         await self.router.connect_channel(['main', 'global'])
 
     async def on_ready(self, ws: ClientWebSocketResponse):
-        print(f"Connected as @{self.user.username}@{self.user.host}")
+        print(f"Connected as @{self.user.username}@{self.config.origin}")
         await self._connect_channel()
         extensions = [
             "exts.post"
@@ -97,4 +97,4 @@ class Autoposter(commands.Bot):
 if __name__ == '__main__':
     bot = Autoposter()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(bot.start(f"wss://{bot.config.origin}/streaming", os.getenv("MISSKEY_TOKEN")))
+    loop.run_until_complete(bot.start(f"wss://{bot.config.origin}/streaming", bot.config.token))
