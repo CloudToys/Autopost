@@ -14,7 +14,7 @@ class Post(commands.Cog):
         line = self.bot.get_random_line()
         while line in self.posted:
             line = self.bot.get_random_line()
-        template = self.bot.config.reply
+        template = self.bot.config.note
         result = template.replace("{text}", line.text).replace("{from}", line.where).replace("{number}", line.number)
         await self.bot.client.note.action.send(content=result, visibility=self.visibility)
         self.posted.append(line)
