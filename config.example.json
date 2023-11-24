@@ -1,0 +1,12 @@
+{
+    "token": "YOUR_ACCESS_TOKEN_HERE",
+    "origin": "YOUR_MISSKEY_SERVER_HERE",
+    "max_duplicate": 3,
+    "rate": 60,
+    "visibility": "home",
+    "worksheet": "YOUR_WORKSHEET_URL_HERE",
+    "template": {
+        "auto": "{note}",
+        "mention": "{note}\n \nFrom {from} ({number})"
+    }
+}
