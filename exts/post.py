@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from mipa.ext import commands, tasks
 from mipa.ext.commands.bot import Bot
 
@@ -13,10 +11,6 @@ class Post(commands.Cog):
 
     @tasks.loop(seconds=1800)
     async def _postLine(self) -> None:
-        now = datetime.now()
-        if now.minute not in [30, 00]: # Only post in n:30 and n:00
-            return
-        
         line = self.bot.get_random_line()
         while line in self.posted:
             line = self.bot.get_random_line()
