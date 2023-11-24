@@ -62,7 +62,7 @@ class Autoposter(commands.Bot):
     async def on_mention(self, notice: NotificationNote):
         line = self.get_random_line()
         info = self.get_info(line)
-        await notice.note.api.action.reply(content=f"{line}\n \n<small>- {info['where']}에서 발췌됨. ({info['number']}번 대사)</small>", reply_id=notice.note.id)
+        await notice.note.api.action.reply(content=f"{line}\n \n<small>- {info['from']}에서 발췌됨. ({info['number']}번 대사)</small>", reply_id=notice.note.id)
 
 
 if __name__ == '__main__':
