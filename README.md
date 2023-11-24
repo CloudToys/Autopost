@@ -3,7 +3,7 @@
 
 ⚠️ **이 봇을 사용할 때에는 봇 친화적인 서버, 또는 개인 서버에서 사용하시는 것을 권장합니다.**
 
-도움이 필요하시다면 [@ALPINE_SECTOR@phater.live](https://phater.live/@ALPINE_SECTOR)로 알려주세요.
+버그가 있거나 도움이 필요하시다면 [@ALPINE_SECTOR@phater.live](https://phater.live/@ALPINE_SECTOR)로 알려주세요.
 
 본 소스 코드의 수정 및 이용은 자유이나, 재배포 시애는 해당 리포지토리의 링크를 걸어주세요!
 
