@@ -1,8 +1,9 @@
 {
     "token": "YOUR_ACCESS_TOKEN_HERE",
     "origin": "YOUR_MISSKEY_SERVER_HERE",
-    "max_duplicate": 3,
+    "duplicateQueueAfter": 3,
     "rate": 60,
+    "startFrom": 30,
     "visibility": "home",
     "worksheet": "YOUR_WORKSHEET_URL_HERE",
     "template": {
