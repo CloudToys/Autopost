@@ -33,7 +33,7 @@ async def setup(bot: Bot):
     if bot.config.start_time is not None:
         print("Waiting until time is coming")
         now = datetime.now()
-        while now.minute != bot.config.start:
+        while now.minute != bot.config.start_time:
             await asyncio.sleep(1)
             now = datetime.now()
         await cog._postLine.start()
