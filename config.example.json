@@ -1,6 +1,7 @@
 {
     "token": "YOUR_ACCESS_TOKEN_HERE",
     "origin": "YOUR_MISSKEY_SERVER_HERE",
+    "credentialsJSONFile": "./credentials.json",
     "duplicateQueueAfter": 3,
     "rate": 60,
     "startFrom": 30,

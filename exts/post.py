@@ -14,13 +14,13 @@ class Post(commands.Cog):
 
     @tasks.loop(seconds=1800)
     async def _postLine(self) -> None:
-        line = self.bot.get_random_line()
+        line = await self.bot.get_random_line()
         while line.text in self.posted:
-            line = self.bot.get_random_line()
+            line = await self.bot.get_random_line()
         template = self.bot.config.note
         result = template.replace("{text}", line.text).replace("{from}", line.where).replace("{number}", line.number)
         await self.bot.client.note.action.send(content=result, visibility=self.visibility)
-        self.posted.append(line)
+        self.posted.append(line.text)
         if len(self.posted) > self.max_count:
             self.posted.pop(0)
 
@@ -36,4 +36,6 @@ async def setup(bot: Bot):
         while now.minute != bot.config.start_time:
             await asyncio.sleep(1)
             now = datetime.now()
+        await cog._postLine.start()
+    else:
         await cog._postLine.start()
