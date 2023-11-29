@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime
 
 from mipa.ext import commands, tasks
@@ -11,9 +10,18 @@ class Post(commands.Cog):
         self.max_count = bot.config.max or 3
         self.visibility = bot.config.visibility or "home"
         self.posted = []
+        self.rate = bot.config.rate or 30
+        self.minute = bot.config.start_time or 0
 
-    @tasks.loop(seconds=1800)
+    @tasks.loop(seconds=60)
     async def _postLine(self) -> None:
+        if datetime.now().minute != self.minute:
+            return
+
+        self.minute = self.minute + self.rate
+        if self.minute >= 60:
+            self.minute = self.minute - 60
+
         line = await self.bot.get_random_line()
         while line.text in self.posted:
             line = await self.bot.get_random_line()
@@ -28,14 +36,4 @@ class Post(commands.Cog):
 async def setup(bot: Bot):
     cog = Post(bot)
     await bot.add_cog(cog)
-    if bot.config.rate is not None:
-        cog._postLine.seconds = bot.config.rate * 60
-    if bot.config.start_time is not None:
-        print("Waiting until time is coming")
-        now = datetime.now()
-        while now.minute != bot.config.start_time:
-            await asyncio.sleep(1)
-            now = datetime.now()
-        await cog._postLine.start()
-    else:
-        await cog._postLine.start()
+    await cog._postLine.start()
