@@ -67,6 +67,7 @@ class Line:
 class Autoposter(commands.Bot):
     def __init__(self):
         super().__init__()
+        self.posted = []
         self.config: Config = Config("./config.json")
         self.agcm = gspread_asyncio.AsyncioGspreadClientManager(self.config.get_creds)
 
@@ -76,16 +77,19 @@ class Autoposter(commands.Bot):
         worksheet = await spreadsheet.get_worksheet(0)
         return worksheet
 
-    async def get_random_line(self, ignore: list) -> Line:
+    async def get_random_line(self) -> Line:
         sheet: Worksheet = await self.get_worksheet()
         response = await sheet.get("F4")
         if response is None or response == "":
             return
         count = int(response[0][0])
         number = 0
-        while number in ignore or number == 0:
+        while number in self.posted or number == 0:
             result = random.randint(1, count)
             number = result + 2
+        self.posted.append(number)
+        if len(self.posted) > self.max_count:
+            self.posted.pop(0)
         return await Line.from_number(number, sheet)
     
     async def get_line(self, number: int) -> Line:
@@ -112,7 +116,7 @@ class Autoposter(commands.Bot):
         if notice.note.reply_id is not None:
             return
 
-        line: Line = self.get_random_line()
+        line: Line = await self.get_random_line()
         template = self.config.reply
         result = template.replace("{text}", line.text).replace("{from}", line.where).replace("{number}", line.number)
         await notice.note.api.action.reply(content=result, visibility=notice.note.visibility, reply_id=notice.note.id)

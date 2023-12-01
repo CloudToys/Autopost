@@ -9,7 +9,6 @@ class Post(commands.Cog):
         self.bot = bot
         self.max_count = bot.config.max or 3
         self.visibility = bot.config.visibility or "home"
-        self.posted = []
         self.rate = bot.config.rate or 30
         self.minute = bot.config.start_time or 0
 
@@ -22,13 +21,10 @@ class Post(commands.Cog):
         if self.minute >= 60:
             self.minute = self.minute - 60
 
-        line = await self.bot.get_random_line(self.posted)
+        line = await self.bot.get_random_line()
         template = self.bot.config.note
         result = template.replace("{text}", line.text).replace("{from}", line.where).replace("{number}", line.number)
         await self.bot.client.note.action.send(content=result, visibility=self.visibility)
-        self.posted.append(line.location)
-        if len(self.posted) > self.max_count:
-            self.posted.pop(0)
 
 
 async def setup(bot: Bot):
