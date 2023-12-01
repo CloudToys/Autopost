@@ -76,14 +76,16 @@ class Autoposter(commands.Bot):
         worksheet = await spreadsheet.get_worksheet(0)
         return worksheet
 
-    async def get_random_line(self) -> Line:
+    async def get_random_line(self, ignore: list) -> Line:
         sheet: Worksheet = await self.get_worksheet()
         response = await sheet.get("F4")
         if response is None or response == "":
             return
         count = int(response[0][0])
-        result = random.randint(1, count)
-        number = result + 2
+        number = 0
+        while number in ignore or number == 0:
+            result = random.randint(1, count)
+            number = result + 2
         return await Line.from_number(number, sheet)
     
     async def get_line(self, number: int) -> Line:

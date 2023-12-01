@@ -22,13 +22,11 @@ class Post(commands.Cog):
         if self.minute >= 60:
             self.minute = self.minute - 60
 
-        line = await self.bot.get_random_line()
-        while line.text in self.posted:
-            line = await self.bot.get_random_line()
+        line = await self.bot.get_random_line(self.posted)
         template = self.bot.config.note
         result = template.replace("{text}", line.text).replace("{from}", line.where).replace("{number}", line.number)
         await self.bot.client.note.action.send(content=result, visibility=self.visibility)
-        self.posted.append(line.text)
+        self.posted.append(line.location)
         if len(self.posted) > self.max_count:
             self.posted.pop(0)
 
