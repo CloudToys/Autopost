@@ -88,7 +88,7 @@ class Autoposter(commands.Bot):
             result = random.randint(1, count)
             number = result + 2
         self.posted.append(number)
-        if len(self.posted) > self.max_count:
+        if len(self.posted) > self.config.max:
             self.posted.pop(0)
         return await Line.from_number(number, sheet)
     

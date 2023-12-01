@@ -7,7 +7,6 @@ from mipa.ext.commands.bot import Bot
 class Post(commands.Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
-        self.max_count = bot.config.max or 3
         self.visibility = bot.config.visibility or "home"
         self.rate = bot.config.rate or 30
         self.minute = bot.config.start_time or 0
